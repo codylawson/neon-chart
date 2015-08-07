@@ -1,10 +1,96 @@
 $(document).ready(function() {
-  var self = this;
+  //var self = this;
 
   // //Fluid Chart
   // $(window).resize(function() {
   //   _resize();
   // });
+
+  function _tooltipContents(d, defaultTitleFormat, defaultValueFormat, color) {
+    var self = this;
+    var config = self.config;
+    var valueFormat = config.tooltip_format_value || defaultValueFormat;
+    var tooltipWrapper;
+    var tooltipHeader;
+    var tooltipContent;
+    var tooltipSubtext;
+    var i;
+    var point;
+    var value;
+    var colorHex;
+    var wavelength;
+    var regions;
+    var region;
+    var regionText;
+
+    //Stub tooltip blocks
+    tooltipWrapper = '<table class="' + self.CLASS.tooltip + '">';
+
+    tooltipHeader = '<thead><tr><th></th>';
+    tooltipHeader += '<th class="c3-tooltip-title">' + config.axis_y_label.text + '</th>';
+    tooltipHeader += '<th class="c3-tooltip-title">' + config.axis_x_label.text + '</th>';
+    tooltipHeader += '</tr></thead>';
+
+    tooltipContent = '<tbody>';
+
+    //Add tooltip content row for each datapoint at this position
+    for (i = 0; i < d.length; i++) {
+      point = d[i];
+
+      if (!(point && (point.value || point.value === 0))) {
+        continue;
+      }
+
+      colorHex = config.data_colors[point.name];
+
+      if (wavelengthLookup[point.x] !== undefined) {
+        wavelength = wavelengthLookup[point.x];
+      } else {
+        wavelength = 'null';
+      }
+
+      value = valueFormat(point.value, point.ratio, point.id, point.index);
+
+      tooltipContent += '<tr>';
+      tooltipContent += '<td class="c3-tooltip-series-name" style="color: ' + colorHex + '">' + point.name + '</td>';
+      tooltipContent += '<td class="c3-tooltip-value">' + value + '</td>';
+      tooltipContent += '<td class="c3-tooltip-value">' + wavelength + ' (' + point.x + ')</td>';
+      tooltipContent += '</tr>';
+    }
+
+    //Get subtext
+    tooltipSubtext = '';
+    //Check if point is within a region
+    regions = config.regions;
+    for (var j = 0; j < regions.length; j++) {
+      region = regions[j];
+
+      if ((point.x >= region.start) && (point.x <= region.end)) {
+        regionText = region.tooltipText;
+      }
+    }
+
+    if (regionText) {
+      tooltipSubtext += '<tr>';
+      tooltipSubtext += '<td class="c3-tooltip-note" colspan="3">' + regionText + '</td>';
+      tooltipSubtext += '</tr>';
+    }
+
+    //Wrap tooltip elem
+    tooltipWrapper += tooltipHeader + tooltipContent + tooltipSubtext;
+    tooltipWrapper += '</tbody></table>';
+
+    return tooltipWrapper;
+  }
+
+  //util sort functions
+  function sortAsc(a, b) {
+    return a - b;
+  }
+
+  function sortDesc(a, b) {
+    return b - a;
+  }
 
   var bandCount = 426;
 
@@ -19,6 +105,7 @@ $(document).ready(function() {
     ascArr2.push(Math.random());
     descArr2.push(Math.random());
   }
+
   var gausianArr = ['Pixel 1'].concat(ascArr.sort(sortAsc)).concat(descArr.sort(sortDesc));
   var gausianArr2 = ['Pixel 2'].concat(ascArr2.sort(sortAsc)).concat(descArr2.sort(sortDesc));
 
@@ -139,93 +226,18 @@ $(document).ready(function() {
     // }
   });
 
-  function _tooltipContents(d, defaultTitleFormat, defaultValueFormat, color) {
-    var $$ = this,
-      config = $$.config,
-      titleFormat = config.tooltip_format_title || defaultTitleFormat,
-      valueFormat = config.tooltip_format_value || defaultValueFormat,
-      tooltipWrapper, tooltipHeader, tooltipContent, tooltipSubtext,
-      i, point, title, value, colorHex, wavelength,
-      regions, region, regionText;
+  // function _alignGridText() {
+  //   d3.selectAll('.c3-xgrid-line text')
+  //     .attr('transform', 'rotate(0)')
+  //     .attr('y', 19)
+  //     .attr('text-anchor', 'start')
+  //     .attr('x', function(val) {
+  //       //get parent dom element
+  //       var lineX = d3.select('.' + val.class + ' line').attr('x1');
+  //
+  //       return parseInt(lineX) + 8;
+  //     });
+  // }
 
-    //Stub tooltip blocks
-    tooltipWrapper = '<table class="' + $$.CLASS.tooltip + '">';
-
-    tooltipHeader = '<thead><tr><th></th>';
-    tooltipHeader += '<th class="c3-tooltip-title">' + config.axis_y_label.text + '</th>';
-    tooltipHeader += '<th class="c3-tooltip-title">' + config.axis_x_label.text + '</th>';
-    tooltipHeader += '</tr></thead>';
-
-    tooltipContent = '<tbody>';
-
-    //Add tooltip content row for each datapoint at this position
-    for (i = 0; i < d.length; i++) {
-      point = d[i];
-
-      if (!(point && (point.value || point.value === 0))) {
-        continue;
-      }
-
-      colorHex = config.data_colors[point.name];
-
-      if (wavelengthLookup[point.x] !== undefined) {
-        wavelength = wavelengthLookup[point.x];
-      } else {
-        wavelength = 'null';
-      }
-
-      value = valueFormat(point.value, point.ratio, point.id, point.index);
-
-      tooltipContent += '<tr>';
-      tooltipContent += '<td class="c3-tooltip-series-name" style="color: ' + colorHex + '">' + point.name + '</td>';
-      tooltipContent += '<td class="c3-tooltip-value">' + value + '</td>';
-      tooltipContent += '<td class="c3-tooltip-value">' + wavelength + ' (' + point.x + ')</td>';
-      tooltipContent += '</tr>';
-    }
-
-    //Get subtext
-    tooltipSubtext = '';
-    //Check if point is within a region
-    regions = config.regions;
-    for (var j = 0; j < regions.length; j++) {
-      region = regions[j];
-
-      if ((point.x >= region.start) && (point.x <= region.end)) {
-        regionText = region.tooltipText;
-      }
-    }
-    if (regionText) {
-      tooltipSubtext += '<tr>';
-      tooltipSubtext += '<td class="c3-tooltip-note" colspan="3">' + regionText + '</td>';
-      tooltipSubtext += '</tr>';
-    }
-
-    //Wrap tooltip elem
-    tooltipWrapper += tooltipHeader + tooltipContent + tooltipSubtext;
-    tooltipWrapper += '</tbody></table>';
-
-    return tooltipWrapper;
-  }
-
-  //util sort functions
-  function sortAsc(a, b) {
-    return a - b;
-  }
-  function sortDesc(a, b) {
-    return b - a;
-  }
-
-    // function _alignGridText() {
-    //   d3.selectAll('.c3-xgrid-line text')
-    //     .attr('transform', 'rotate(0)')
-    //     .attr('y', 19)
-    //     .attr('text-anchor', 'start')
-    //     .attr('x', function(val) {
-    //       //get parent dom element
-    //       var lineX = d3.select('.' + val.class + ' line').attr('x1');
-    //
-    //       return parseInt(lineX) + 8;
-    //     });
-    // }
-
+  return chart;
 });
