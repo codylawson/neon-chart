@@ -78,7 +78,7 @@ module.exports = function(grunt) {
   });
 
   // Default task.
-  grunt.registerTask('default', 'Lint and compile stuff', ['wiredep', 'jshint', 'sass']);
+  grunt.registerTask('init', 'Lint and compile stuff', ['wiredep', 'jshint', 'sass']);
 
   //Init for things like libs
   grunt.registerTask('serve', 'watch and serve stuff', ['jshint', 'sass', 'connect', 'watch']);
