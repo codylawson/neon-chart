@@ -1,0 +1,119 @@
+.neon-chart.c3 {
+  height: 100%;
+
+  svg {
+    font-family: $font-family;
+  }
+  .c3-title {
+    fill: $gray-light;
+    font-size: 1.7em;
+    font-weight: 300;
+  }
+  .tick {
+    fill: $gray;
+    font-size: 1.6em;
+    line {
+      stroke: $gray-dark;
+    }
+  }
+  path.domain,
+  line.domain {
+    stroke: $gray-dark;
+  }
+  .c3-xgrid,
+  .c3-ygrid {
+    stroke: $gray-dark;
+    stroke-dasharray: none;
+  }
+  .c3-grid-lines {
+    pointer-events: none;
+
+    line {
+      stroke: $gray-dark;
+    }
+    text {
+      fill: $gray;
+      font-size: 1.6em;
+    }
+  }
+  .c3-axis-y-label,
+  .c3-axis-x-label {
+    font-size: 1.7em;
+    fill: $gray-light;
+    font-weight: 300;
+  }
+  .c3-axis-x .tick {
+    &:first-of-type {
+      text {
+        text-anchor: start !important;
+      }
+    }
+    &:last-of-type {
+      text {
+        text-anchor: end !important;
+      }
+    }
+  }
+  .c3-circle:not(._expanded_) {
+    fill: transparent !important;
+  }
+  .c3-legend-item {
+    text {
+      fill: $gray-light;
+      font-size: 1.4em;
+    }
+  }
+  .c3-legend-item-hidden {
+    opacity: 0.35;
+  }
+  .c3-region {
+    fill: $gray-dark;
+
+    rect {
+      fill-opacity: .75 !important;
+    }
+  }
+  .c3-line {
+    stroke-width: 2px;
+  }
+  .c3-target.c3-focused path.c3-line {
+    stroke-width: 3px;
+  }
+  .c3-tooltip {
+    opacity: 1;
+    border-radius: 2px;
+    border: none;
+    box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15), 0 2px 3px rgba(0, 0, 0, 0.25);
+    font-family: $font-family;
+    max-width: 300px;
+    tr,
+    th,
+    td {
+      border-radius: 2px;
+      border: 0;
+    }
+    th {
+      background: $gray-lighter;
+      padding: 5px;
+      color: $gray-dark;
+      border-bottom: 1px solid $gray-light;
+      text-align: center;
+      font-size: 1.2em;
+    }
+    td {
+      font-size: 1.2em;
+      padding: 8px;
+    }
+    .c3-tooltip-title,
+    tr .name {
+      color: $gray;
+    }
+    .c3-tooltip-value,
+    tr .value {
+      color: $gray-dark;
+    }
+    td.c3-tooltip-note {
+      border-top: 1px solid $gray-light;
+    }
+  }
+}

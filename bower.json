@@ -1,0 +1,23 @@
+{
+  "name": "trunk",
+  "version": "0.0.0",
+  "authors": [
+    "Cody Lawson <CLawson@esri.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "d3": "~3.5.6",
+    "c3": "~0.4.11"
+  },
+  "resolutions": {
+    "d3": "~3.5.6"
+  }
+}
