@@ -18,7 +18,7 @@ $(document).ready(function() {
     var point;
     var value;
     var colorHex;
-    var wavelength;
+    // var wavelength;
     var regions;
     var region;
     var regionText;
@@ -43,18 +43,12 @@ $(document).ready(function() {
 
       colorHex = config.data_colors[point.name];
 
-      if (wavelengthLookup[point.x] !== undefined) {
-        wavelength = wavelengthLookup[point.x];
-      } else {
-        wavelength = 'null';
-      }
-
       value = valueFormat(point.value, point.ratio, point.id, point.index);
 
       tooltipContent += '<tr>';
       tooltipContent += '<td class="c3-tooltip-series-name" style="color: ' + colorHex + '">' + point.name + '</td>';
       tooltipContent += '<td class="c3-tooltip-value">' + value + '</td>';
-      tooltipContent += '<td class="c3-tooltip-value">' + wavelength + ' (' + point.x + ')</td>';
+      tooltipContent += '<td class="c3-tooltip-value">' + point.x + '</td>';
       tooltipContent += '</tr>';
     }
 
@@ -83,56 +77,15 @@ $(document).ready(function() {
     return tooltipWrapper;
   }
 
-  //util sort functions
-  function sortAsc(a, b) {
-    return a - b;
-  }
-
-  function sortDesc(a, b) {
-    return b - a;
-  }
-
-  var bandCount = 426;
-
-  //Dummy Data
-  var ascArr = [];
-  var descArr = [];
-  var ascArr2 = [];
-  var descArr2 = [];
-  for (var k = 0; k <= (bandCount / 2); k++) {
-    ascArr.push(Math.random());
-    descArr.push(Math.random());
-    ascArr2.push(Math.random());
-    descArr2.push(Math.random());
-  }
-
-  var gausianArr = ['Pixel 1'].concat(ascArr.sort(sortAsc)).concat(descArr.sort(sortDesc));
-  var gausianArr2 = ['Pixel 2'].concat(ascArr2.sort(sortAsc)).concat(descArr2.sort(sortDesc));
-
-  //generate x axis array
-  var xAxis = ['x'];
-  for (var j = 0; j <= bandCount; j++) {
-    xAxis.push(j);
-  }
-
-  //generate wavelength values
-  var wavelengthLookup = {};
-  var wavelengthMin = 582;
-  var wavelengthMax = 2511;
-  for (var l = 0; l <= bandCount; l++) {
-    wavelengthLookup[l] = parseInt((wavelengthMax - wavelengthMin) / bandCount * l) + wavelengthMin;
-  }
-
   //generate chart
   var chart = c3.generate({
     bindto: '#chart',
     data: {
       x: 'x',
-      columns: [
-        xAxis,
-        gausianArr,
-        gausianArr2
-      ],
+      url: 'js/data.json',
+      mimeType: 'json',
+      min: 350,
+      max: 2500,
       type: 'spline',
       colors: {
         'Pixel 1': '#3D9EE0',
@@ -155,24 +108,16 @@ $(document).ready(function() {
           position: 'outer-center'
         },
         tick: {
-          count: 10//,
-          // format: function(x) {
-          //   var tickLabel = '';
-          //   if (wavelengthLookup[x] !== undefined) {
-          //     tickLabel = wavelengthLookup[x];
-          //   }
-          //
-          //   return x;
-          // }
+          count: 10,
+          format: function(x) {
+            return Math.round(x);
+          }
         }
       },
       y: {
         label: {
           text: 'Reflectance',
           position: 'outer-middle'
-        },
-        tick: {
-          values: [0, 0.2, 0.4, 0.6, 0.8, 1]
         }
       }
     },
@@ -189,33 +134,33 @@ $(document).ready(function() {
     },
     regions: [{
       axis: 'x',
-      start: 192,
-      end: 213,
+      start: 692,
+      end: 713,
       class: 'band-1',
       tooltipText: 'Band 1 content Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
     }, {
       axis: 'x',
-      start: 282,
-      end: 315,
+      start: 782,
+      end: 815,
       class: 'band-2',
       tooltipText: 'Band 2 content Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
     }],
     grid: {
       x: {
         lines: [{
-          value: 0,
+          value: 350,
           text: 'VIS',
           class: 'wavelength-line-vis'
         }, {
-          value: 80,
+          value: 430,
           text: 'NIR',
           class: 'wavelength-line-nir'
         }, {
-          value: 192,
+          value: 692,
           text: 'Band 1',
           class: 'band-line-1'
         }, {
-          value: 282,
+          value: 782,
           text: 'Band 2',
           class: 'band-line-2'
         }]
