@@ -9,7 +9,8 @@
     "_": false,
     "define": false,
     "require": false,
-    "c3": false
+    "c3": false,
+    "d3": false
   },
   "jquery": true,
 
@@ -36,6 +37,7 @@
   // Relax
   "eqnull": true,
   "esnext": false,
-  "evil": false
+  "evil": false,
+  "loopfunc": true
   // "sub": false // (deprecated - moved to jscs)
 }
