@@ -29,6 +29,7 @@ $(document).ready(function() {
     tooltipHeader = '<thead><tr><th></th>';
     tooltipHeader += '<th class="c3-tooltip-title">' + config.axis_y_label.text + '</th>';
     tooltipHeader += '<th class="c3-tooltip-title">' + config.axis_x_label.text + '</th>';
+    tooltipHeader += '<th class="c3-tooltip-title">Band</th>';
     tooltipHeader += '</tr></thead>';
 
     tooltipContent = '<tbody>';
@@ -49,6 +50,7 @@ $(document).ready(function() {
       tooltipContent += '<td class="c3-tooltip-series-name" style="color: ' + colorHex + '">' + point.name + '</td>';
       tooltipContent += '<td class="c3-tooltip-value">' + value + '</td>';
       tooltipContent += '<td class="c3-tooltip-value">' + point.x + '</td>';
+      tooltipContent += '<td class="c3-tooltip-value">' + Math.round(point.x * 0.25) + '</td>'; // TODO: Replace Band calculation with real data
       tooltipContent += '</tr>';
     }
 
@@ -59,14 +61,14 @@ $(document).ready(function() {
     for (var j = 0; j < regions.length; j++) {
       region = regions[j];
 
-      if ((point.x >= region.start) && (point.x <= region.end)) {
+      if ((point.x >= region.start) && (point.x <= region.end) && !regionText) {
         regionText = region.tooltipText;
       }
     }
 
     if (regionText) {
       tooltipSubtext += '<tr>';
-      tooltipSubtext += '<td class="c3-tooltip-note" colspan="3">' + regionText + '</td>';
+      tooltipSubtext += '<td class="c3-tooltip-note" colspan="4">' + regionText + '</td>';
       tooltipSubtext += '</tr>';
     }
 
@@ -75,6 +77,74 @@ $(document).ready(function() {
     tooltipWrapper += '</tbody></table>';
 
     return tooltipWrapper;
+  }
+
+  function _generateXAxisRanges() {
+    //Clean up previous renders
+    d3.selectAll('.c3-axis-ranges').remove();
+
+    //Create graphic that all ranges and text will be placed in
+    var rangeContainer = d3.select('.c3-axis-x').append('g')
+      .attr('class', 'c3-axis-x-ranges c3-axis-ranges')[0][0];
+
+    //Move axis label down to make room for other elements
+    d3.select('.c3-axis-x-label')
+      .attr('dy', '6em');
+
+    //Place regions with the 'range' class in the xaxis ranges graphic
+    var regions = d3.selectAll('.c3-regions [class*="c3-axis-range"]')[0];
+
+    //Loop through regions and place them in x axis
+    for (var i = 0; i < regions.length; i++) {
+      var region = regions[i];
+      var rect = region.firstElementChild;
+
+      //Set range defaults
+      var rangeElHeight = 20; //Height of range in axis
+      var rangeElYOffset = 30; //Distance from axis top
+      var textOffset = 20; //Base off text height
+
+      //Get range size and position values
+      var rangeWidth = d3.select(rect)[0][0].width.baseVal.value; //Width of the range
+      var rectXOffset = d3.select(rect)[0][0].x.baseVal.value; //Distance from chart left
+
+      //resize region
+      d3.select(rect)
+        .attr('y', rangeElYOffset)
+        .attr('height', rangeElHeight)
+        .attr('stroke-dasharray', '0,' + rangeWidth + ',' + (rangeElHeight + rangeWidth + rangeElHeight))
+        .attr('stroke-width', 1);
+
+      //move to the axis node
+      rangeContainer.appendChild(region);
+
+      //get range text
+      var rangeText = '';
+      d3.select(rect)
+        .attr('rangeName', function(val) {
+          rangeText = val.rangeName;
+
+          return val.rangeName;
+        });
+
+      //place range text
+      d3.select(rangeContainer).append('text')
+        .text(rangeText)
+        .attr('text-anchor', 'middle')
+        .attr('x', function(val) {
+          var middleOffset = rangeWidth * 0.5;
+          var rangeX = rectXOffset;
+
+          return rangeX += middleOffset;
+        })
+        .attr('class', 'range-text')
+        .attr('y', (rangeElYOffset + rangeElHeight + textOffset));
+
+      //transform ranges to give the elements space
+      var translateCalc = rangeWidth * 0.03;
+      d3.select(region)
+        .attr('transform', 'scale(.98, 1), translate(' + translateCalc + ', 0)');
+    }
   }
 
   //generate chart
@@ -88,8 +158,8 @@ $(document).ready(function() {
       max: 2500,
       type: 'spline',
       colors: {
-        'Pixel 1': '#3D9EE0',
-        'Pixel 2': '#f05050'
+        'Pixel 1': '#3D9EE0'//,
+        //'Pixel 2': '#f05050'
       }
     },
     title: {
@@ -98,13 +168,13 @@ $(document).ready(function() {
     padding: {
       top: 20,
       right: 100,
-      bottom: 40,
+      bottom: 100,
       left: 100,
     },
     axis: {
       x: {
         label: {
-          text: 'Wavelength',
+          text: 'Wavelength (nm)',
           position: 'outer-center'
         },
         tick: {
@@ -118,7 +188,8 @@ $(document).ready(function() {
         label: {
           text: 'Reflectance',
           position: 'outer-middle'
-        }
+        },
+        min: 0
       }
     },
     tooltip: {
@@ -134,55 +205,52 @@ $(document).ready(function() {
     },
     regions: [{
       axis: 'x',
-      start: 692,
-      end: 713,
+      start: 1350,
+      end: 1450,
       class: 'band-1',
-      tooltipText: 'Band 1 content Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+      tooltipText: 'Atmospheric Window: content Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
     }, {
       axis: 'x',
-      start: 782,
-      end: 815,
+      start: 1800,
+      end: 1950,
       class: 'band-2',
-      tooltipText: 'Band 2 content Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+      tooltipText: 'Atmospheric Window: content Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+    }, {
+      axis: 'x',
+      start: 350,
+      end: 700,
+      class: 'c3-axis-range range-vis',
+      rangeName: 'Visible'
+    }, {
+      axis: 'x',
+      start: 700,
+      end: 1400,
+      class: 'c3-axis-range range-nir',
+      rangeName: 'NIR'
+    }, {
+      axis: 'x',
+      start: 1400,
+      end: 2500,
+      class: 'c3-axis-range range-swir',
+      rangeName: 'SWIR'
     }],
     grid: {
-      x: {
-        lines: [{
-          value: 350,
-          text: 'VIS',
-          class: 'wavelength-line-vis'
-        }, {
-          value: 430,
-          text: 'NIR',
-          class: 'wavelength-line-nir'
-        }, {
-          value: 692,
-          text: 'Band 1',
-          class: 'band-line-1'
-        }, {
-          value: 782,
-          text: 'Band 2',
-          class: 'band-line-2'
-        }]
-      }
-    }//,
-    // onrendered: function() {
-    //   _alignGridText();
-    // }
+      // x: {
+      //   lines: [{
+      //     value: 350,
+      //     text: 'VIS',
+      //     class: 'wavelength-line-vis'
+      //   }, {
+      //     value: 430,
+      //     text: 'NIR',
+      //     class: 'wavelength-line-nir'
+      //   }]
+      // }
+    },
+    onrendered: function() {
+      _generateXAxisRanges();
+    }
   });
-
-  // function _alignGridText() {
-  //   d3.selectAll('.c3-xgrid-line text')
-  //     .attr('transform', 'rotate(0)')
-  //     .attr('y', 19)
-  //     .attr('text-anchor', 'start')
-  //     .attr('x', function(val) {
-  //       //get parent dom element
-  //       var lineX = d3.select('.' + val.class + ' line').attr('x1');
-  //
-  //       return parseInt(lineX) + 8;
-  //     });
-  // }
 
   return chart;
 });

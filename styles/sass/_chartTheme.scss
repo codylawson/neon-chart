@@ -4,11 +4,8 @@
   svg {
     font-family: $font-family;
   }
-  .c3-title {
-    fill: $gray-light;
-    font-size: 1.7em;
-    font-weight: 300;
-  }
+
+  //Chart plot and grid
   .tick {
     fill: $gray;
     font-size: 1.6em;
@@ -36,12 +33,22 @@
       font-size: 1.6em;
     }
   }
+
+  //Title and Axis labels
+  .c3-title {
+    fill: $gray-lighter;
+    font-size: 1.7em;
+    font-weight: 300;
+  }
+
   .c3-axis-y-label,
   .c3-axis-x-label {
     font-size: 1.7em;
     fill: $gray-light;
     font-weight: 300;
   }
+
+  //Axis tick label positioning
   .c3-axis-x .tick {
     &:first-of-type {
       text {
@@ -54,38 +61,59 @@
       }
     }
   }
+
+  //Hide points(circles) by default
   .c3-circle:not(._expanded_) {
     fill: transparent !important;
   }
+
+  //Legend
   .c3-legend-item {
     text {
-      fill: $gray-light;
+      fill: $gray-lighter;
       font-size: 1.4em;
     }
   }
   .c3-legend-item-hidden {
     opacity: 0.35;
   }
+
+  //Chart regions, show areas of poor data
   .c3-region {
-    fill: $gray-dark;
+    fill: darken($gray-darker, 3%);
 
     rect {
-      fill-opacity: .75 !important;
+      fill-opacity: 0.75 !important;
     }
   }
+
+  //X Axis ranges
+  .c3-region[class*='range'] {
+    fill: transparent;
+    stroke: $gray-dark;
+  }
+
+  .range-text {
+    fill: $gray;
+    font-size: 1.6em;
+  }
+
+  //Line series
   .c3-line {
     stroke-width: 2px;
   }
   .c3-target.c3-focused path.c3-line {
     stroke-width: 3px;
   }
+
+  //Tooltip
   .c3-tooltip {
     opacity: 1;
     border-radius: 2px;
     border: none;
     box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.15), 0 2px 3px rgba(0, 0, 0, 0.25);
     font-family: $font-family;
-    max-width: 300px;
+    max-width: 350px;
     tr,
     th,
     td {
@@ -94,14 +122,14 @@
     }
     th {
       background: $gray-lighter;
-      padding: 5px;
+      padding: 8px;
       color: $gray-dark;
       border-bottom: 1px solid $gray-light;
       text-align: center;
-      font-size: 1.2em;
+      font-size: 1em;
     }
     td {
-      font-size: 1.2em;
+      font-size: 1em;
       padding: 8px;
     }
     .c3-tooltip-title,
