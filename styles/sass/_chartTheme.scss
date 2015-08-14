@@ -1,5 +1,9 @@
 .neon-chart.c3 {
-  height: 100%;
+  height: 95%;
+  width: 95%;
+  margin: 0 auto;
+  top: 50%;
+  transform: translateY(-50%);
 
   svg {
     font-family: $font-family;
@@ -62,9 +66,10 @@
     }
   }
 
-  //Hide points(circles) by default
-  .c3-circle:not(._expanded_) {
-    fill: transparent !important;
+  //Focus circle
+  .c3-circle {
+    stroke: $gray-darker;
+    stroke-width: 3px;
   }
 
   //Legend
@@ -91,6 +96,11 @@
   .c3-region[class*='range'] {
     fill: transparent;
     stroke: $gray-dark;
+  }
+
+  .c3-regions .c3-region[class*='range'] {
+    fill: transparent;
+    stroke: transparent;
   }
 
   .range-text {
@@ -143,5 +153,9 @@
     td.c3-tooltip-note {
       border-top: 1px solid $gray-light;
     }
+  }
+
+  .hint {
+    color: $gray;
   }
 }
