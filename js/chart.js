@@ -6,6 +6,52 @@ $(document).ready(function() {
     });
   });
 
+  $('.btn-edit-series-names').on('click', function() {
+    //show div
+    $('.rename-series-container').removeClass('hidden');
+
+    //get data series
+    var dataSeries = chart.data();
+    var dataSeriesNames = chart.data.names();
+
+    //destroy data series inputs if some already exist
+    $('.rename-series-input').remove();
+
+    //populate input for each data series
+    for (var i = 0; i < dataSeries.length; i++) {
+      var theSeries = dataSeries[i];
+      var theSeriesName = dataSeriesNames[theSeries.id] || theSeries.id;
+
+      var seriesInput = $('<input type="text" value="' + theSeriesName + '">')
+        .attr('class', 'rename-series-input')
+        .data('seriesId', theSeries.id);
+
+      $('.rename-series-inputs').append(seriesInput);
+    }
+  });
+
+  $('.btn-rename-series-cancel').on('click', function() {
+    //hide div
+    $('.rename-series-container').addClass('hidden');
+  });
+
+  $('.btn-rename-series-apply').on('click', function() {
+    //hide div
+    $('.rename-series-container').addClass('hidden');
+
+    //apply new values
+    var renameSeriesInputs = $('.rename-series-input');
+    var renameObj = {};
+
+    for (var i = 0; i < renameSeriesInputs.length; i++) {
+      var seriesInput = renameSeriesInputs[i];
+      var seriesInputData = $(seriesInput).data();
+      renameObj[seriesInputData.seriesId] = seriesInput.value;
+    }
+
+    chart.data.names(renameObj);
+  });
+
   /*
   * CONSTANTS
   * atmosphericWindows: array of regions to be displayed as dark vertical blocks on the chart
@@ -288,6 +334,9 @@ $(document).ready(function() {
         }
       }
     },
+    zoom: {
+      enabled: true
+    },
     colors: {
       pattern: ['#3D9EE0', '#f05050']
     },
@@ -307,7 +356,7 @@ $(document).ready(function() {
           position: 'outer-center'
         },
         tick: {
-          count: 10,
+          count: 5,
           format: function(x) {
             return Math.round(x);
           }
@@ -338,9 +387,12 @@ $(document).ready(function() {
     },
     onrendered: function() {
       _generateXAxisRanges();
+
       if (chartConfig.hideAtmosphericWindowData && chartConfig.atmosphericWindows) {
         _wireAtmWinTooltip();
       }
+
+      // _editableSeriesName();
     }
   });
 
